@@ -39,7 +39,6 @@ jar {
     }
 }
 
-
 task runApp(type: JavaExec) {
     mainClass.set('com.todomvc.Main')
     classpath = sourceSets.main.runtimeClasspath
