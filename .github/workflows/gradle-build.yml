@@ -1,4 +1,4 @@
-echo "name: Build and Test
+name: Build and Test
 
 on:
   push:
@@ -25,9 +25,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
-          key: \$\{runner.os\}-gradle-\$\{hashFiles('**/*.gradle*')\}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: |
-            \$\{runner.os\}-gradle-
+            ${{ runner.os }}-gradle-
 
       - name: Build with Gradle
         run: ./gradlew build --no-daemon
@@ -40,4 +40,3 @@ jobs:
         with:
           name: build
           path: build/libs
-" > .github\workflows\gradle-build.yml
