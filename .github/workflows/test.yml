@@ -16,36 +16,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17' # Change this to your JDK version
-
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18' # Change this to your Node.js version
+        node-version: '18' # Adjust to your Node.js version
 
-    - name: Cache Gradle and Node modules
+    - name: Cache Node modules
       uses: actions/cache@v3
       with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-          node_modules
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}-node-${{ hashFiles('package-lock.json') }}
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
         restore-keys: |
-          ${{ runner.os }}-gradle-
           ${{ runner.os }}-node-
 
     - name: Install dependencies
-      run: |
-        npm install
-        gradle wrapper --gradle-version 7.4.2 # Use your Gradle version
-        gradle build
+      run: npm install
 
-    - name: Run tests
-      run: gradle runTests
+    - name: Run Gradle tests
+      run: ./gradlew runTests
 
     - name: Upload coverage report
       uses: actions/upload-artifact@v3

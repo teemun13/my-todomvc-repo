@@ -3,7 +3,7 @@ plugins {
 }
 
 task runMochaTests(type: Exec) {
-    commandLine 'C:/Program Files/nodejs/npm.cmd', 'test'
+    commandLine 'npm', 'test'
     workingDir file('test')
 }
 
@@ -22,5 +22,4 @@ generateCoverageReport.dependsOn runMochaTests
 task runTests {
     dependsOn runMochaTests, generateCoverageReport
 }
-
 

@@ -1,24 +1,15 @@
 'use strict';
 
-// Include Gulp & Tools We'll Use
-var gulp = require('gulp');
-var $ = require('gulp-load-plugins')();
-var del = require('del');
-var runSequence = require('run-sequence');
-var pagespeed = require('psi');
-var app = require('./server');
-var vinylfs = require('vinyl-fs');
+const gulp = require('gulp');
+const $ = require('gulp-load-plugins')();
+const del = require('del');
+const runSequence = require('run-sequence');
+const pagespeed = require('psi');
+const app = require('./server');
+const vinylfs = require('vinyl-fs');
 
-var AUTOPREFIXER_BROWSERS = [
-	'ie >= 10',
-	'ie_mob >= 10',
-	'ff >= 30',
-	'chrome >= 34',
-	'safari >= 7',
-	'opera >= 23',
-	'ios >= 7',
-	'android >= 4.4',
-	'bb >= 10'
+const AUTOPREFIXER_BROWSERS = [
+	// Your browsers list
 ];
 
 // Lint JavaScript
@@ -59,7 +50,6 @@ gulp.task('copy', function () {
 
 // Compile and Automatically Prefix Stylesheets
 gulp.task('styles', function () {
-	// For best performance, don't add Sass partials to `gulp.src`
 	return gulp.src([
 		'site-assets/*.css'
 	])
@@ -71,39 +61,31 @@ gulp.task('styles', function () {
 
 // Scan Your HTML For Assets & Optimize Them
 gulp.task('html', function () {
-	var assets = $.useref.assets({searchPath: '{.tmp,.}'});
+	const assets = $.useref.assets({searchPath: '{.tmp,.}'});
 
 	return gulp.src('index.html')
 		.pipe(assets)
 		.pipe(assets.restore())
 		.pipe($.useref())
-		// Output Files
 		.pipe(gulp.dest('dist'))
-		// Running vulcanize over the written output
-		// because it requires access to the written
-		// CSS and JS.
 		.pipe($.vulcanize({ dest: 'dist', strip: true }))
 		.pipe($.size({title: 'html'}));
 });
 
 // Clean Output Directory
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
-
-// Build Production Files, the Default Task
-gulp.task('default', ['clean'], function (cb) {
-	runSequence(['styles', 'copy'], ['jshint', 'html', 'images'], cb);
+gulp.task('clean', function () {
+	return del(['.tmp', 'dist']);
 });
 
+// Build Production Files, the Default Task
+gulp.task('default', gulp.series('clean', gulp.parallel('styles', 'copy'), gulp.parallel('jshint', 'html', 'images')));
+
 // Run PageSpeed Insights
-// Update `url` below to the public URL for your site
-gulp.task('pagespeed', pagespeed.bind(null, {
-	// By default, we use the PageSpeed Insights
-	// free (no API key) tier. You can use a Google
-	// Developer API key if you have one. See
-	// http://goo.gl/RkN0vE for info key: 'YOUR_API_KEY'
-	url: 'https://todomvc.com',
-	strategy: 'mobile'
-}));
+gulp.task('pagespeed', function () {
+	return pagespeed('https://todomvc.com', {
+		strategy: 'mobile'
+	});
+});
 
 gulp.task('serve', function (cb) {
 	app.listen(8080, cb);

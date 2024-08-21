@@ -20,3 +20,11 @@ Object.defineProperty(module.exports, 'learnJson', {
 		});
 	}
 });
+
+app.use(express.static('dist'));
+
+app.listen(8000, () => {
+    console.log('Server running on http://localhost:8000');
+});
+
+module.exports = app;
