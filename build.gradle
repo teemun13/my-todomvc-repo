@@ -1,55 +1,45 @@
-plugins {
-    id 'java'
-    id 'application'
+// Task to run Mocha tests
+task runMochaTests(type: Exec) {
+    commandLine 'npm', 'test'
+    workingDir file('test')
 }
 
-group = 'com.todomvc'
-version = '1.0.0'
-
-sourceCompatibility = '11'
-targetCompatibility = '11'
-
-repositories {
-    mavenCentral()
+// Task to generate Cypress coverage report
+task generateCoverageReport(type: Exec) {
+    commandLine 'npx', 'cypress', 'run', '--env', 'coverage=true'
+    workingDir file('test')
 }
 
-dependencies {
-    // Add necessary dependencies
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    implementation 'org.springframework:spring-web:5.3.20'
-    implementation 'org.slf4j:slf4j-api:1.7.36'
-    testImplementation 'junit:junit:4.13.2'
+// Task to clean old coverage reports
+task cleanCoverageReport(type: Delete) {
+    delete fileTree(dir: 'test/coverage')
 }
 
-application {
-    mainClass.set('com.todomvc.Main')
-}
-
-jar {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
-    manifest {
-        attributes(
-            'Main-Class': 'com.todomvc.Main'
-        )
-    }
-    
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
-
-task runApp(type: JavaExec) {
-    mainClass.set('com.todomvc.Main')
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task buildReport {
+// Task to generate a test report
+task generateTestReport {
     doLast {
-        println "Build report generated at: build/reports"
+        def reportDir = file('test/reports')
+        if (!reportDir.exists()) {
+            reportDir.mkdirs()
+        }
+        
+        def reportFile = file('test/reports/test-report.txt')
+        reportFile.text = "Test results:\n\n"
+
+        // Here you can add logic to summarize test results and write to the reportFile
+        // For example, you might parse test results or use a reporting tool
+
+        println "Test report generated at: ${reportFile.absolutePath}"
     }
 }
 
-tasks.named('build') {
-    dependsOn 'buildReport'
+// Task dependencies
+runMochaTests.dependsOn cleanCoverageReport
+generateCoverageReport.dependsOn runMochaTests
+generateTestReport.dependsOn generateCoverageReport
+
+// Task to run all tests and generate reports
+task runTests {
+    dependsOn runMochaTests, generateCoverageReport, generateTestReport
 }
+

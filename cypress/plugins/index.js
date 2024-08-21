@@ -15,3 +15,15 @@ module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
 }
+const { defineConfig } = require('cypress');
+const { startDevServer } = require('@cypress/vite-dev-server');
+
+module.exports = defineConfig({
+  e2e: {
+    setupNodeEvents(on, config) {
+      require('@cypress/code-coverage/task')(on, config);
+      return config;
+    },
+    // Other Cypress configurations
+  },
+});

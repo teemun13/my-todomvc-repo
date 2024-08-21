@@ -1,0 +1,26 @@
+plugins {
+    id 'base'
+}
+
+task runMochaTests(type: Exec) {
+    commandLine 'C:/Program Files/nodejs/npm.cmd', 'test'
+    workingDir file('test')
+}
+
+task generateCoverageReport(type: Exec) {
+    commandLine 'npx', 'cypress', 'run', '--env', 'coverage=true'
+    workingDir file('test')
+}
+
+task cleanCoverageReport(type: Delete) {
+    delete fileTree('test/coverage')
+}
+
+runMochaTests.dependsOn cleanCoverageReport
+generateCoverageReport.dependsOn runMochaTests
+
+task runTests {
+    dependsOn runMochaTests, generateCoverageReport
+}
+
+
