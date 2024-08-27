@@ -5,21 +5,37 @@ plugins {
 task runMochaTests(type: Exec) {
     commandLine 'npm', 'test'
     workingDir file('test')
+    doLast {
+        println "Mocha tests completed."
+    }
 }
 
 task generateCoverageReport(type: Exec) {
     commandLine 'npx', 'cypress', 'run', '--env', 'coverage=true'
     workingDir file('test')
+    doLast {
+        println "Cypress coverage report generated."
+    }
 }
 
 task cleanCoverageReport(type: Delete) {
     delete fileTree('test/coverage')
 }
 
+task generateMochaReport(type: Exec) {
+    commandLine 'npx', 'mocha', '--reporter', 'spec'
+    workingDir file('test')
+    doLast {
+        println "Mocha test report generated."
+    }
+}
+
 runMochaTests.dependsOn cleanCoverageReport
 generateCoverageReport.dependsOn runMochaTests
+generateMochaReport.dependsOn runMochaTests
 
 task runTests {
-    dependsOn runMochaTests, generateCoverageReport
+    dependsOn runMochaTests, generateCoverageReport, generateMochaReport
 }
+
 
