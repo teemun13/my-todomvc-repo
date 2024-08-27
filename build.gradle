@@ -54,4 +54,16 @@ tasks.named('build') {
     dependsOn 'buildReport'
 }
 
+test {
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+}
+
 
